@@ -1,0 +1,58 @@
+/dts-v1/;
+
+/ {
+	description = "U-Boot fitImage for Android";
+	#address-cells = <1>;
+
+	images {
+		kernel@1 {
+			description = "Linux kernel";
+			data = /incbin/("signed/zImage");
+			type = "kernel";
+			arch = "arm";
+			os = "linux";
+			compression = "none";
+			load = <0x82000000>;
+			entry = <0x82000000>;
+		};
+
+		am57xx-evm-reva3.dtb {
+			description = "Flattened Device Tree blob";
+			data = /incbin/("signed/dtb/am57xx-evm-reva3.dtb");
+			type = "flat_dt";
+			arch = "arm";
+			compression = "none";
+		};
+
+		optee {
+			description = "OPTEE OS Image";
+			data = /incbin/("signed/tee.bin");
+			type = "tee";
+			arch = "arm";
+			compression = "none";
+		};
+
+                ramdisk@1 {
+                        description = "Android Ramdisk";
+                        data = /incbin/("signed/ramdisk.img");
+                        type = "ramdisk";
+                        arch = "arm";
+                        os = "linux";
+                        compression = "gzip";
+                        load = <0>;
+                        entry = <0>;
+		};
+	};
+
+	configurations {
+		default = "am57xx-evm-reva3.dtb";
+
+		am57xx-evm-reva3.dtb {
+			description = "Linux kernel, FDT blob, OPTEE OS, RAMDISK";
+			kernel = "kernel@1";
+			fdt = "am57xx-evm-reva3.dtb";
+			ramdisk = "ramdisk@1";
+			loadables = "optee";
+		};
+	};
+};
